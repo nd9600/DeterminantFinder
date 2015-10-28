@@ -125,7 +125,7 @@ public class DeterminantFinder {
 				System.out.println("new determinant is: " + determinant);
 			}
 		}
-		
+
 		return determinant;
 	}
 }
