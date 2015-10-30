@@ -152,15 +152,14 @@ public class DeterminantFinder {
 		System.out.println("");
 		System.out.println("sizeOfMatrix is: " + sizeOfMatrix);
 
-		//Calculates the max number of zeros in any row or column 
+		// Calculates the max number of zeros in any row or column
 		Object[] rowOrColumnWithMostZeroes = getRowOrColumnWithMostZeroes(matrix, sizeOfMatrix);
 		String rowOrColumnWithMax = (String) rowOrColumnWithMostZeroes[0];
-		int maxNumberOfZeros = (int) rowOrColumnWithMostZeroes[1];
+		int rowOrColumnNumber = (int) rowOrColumnWithMostZeroes[1];
 		Boolean rowOrColumnAllZeros = (Boolean) rowOrColumnWithMostZeroes[2];
 
-		System.out.println("rowOrColumnWithMostZeroes: " + rowOrColumnWithMax + ", " + maxNumberOfZeros + ", "
-				+ rowOrColumnAllZeros);
-
+		System.out.println("Getting relevantElements from " + rowOrColumnWithMax + " " + (rowOrColumnNumber+1));
+		System.out.println("rowOrColumnAllZeros: " + rowOrColumnAllZeros);
 		// If a row or column has all elements equal to zero, the determinant is
 		// zero, so there is no point calculating it
 		if (rowOrColumnAllZeros) {
@@ -178,6 +177,7 @@ public class DeterminantFinder {
 			Double c = matrix[1][0];
 			Double d = matrix[1][1];
 			determinant = (a * d - b * c);
+			System.out.println("determinant is: " + determinant);
 
 			return determinant;
 		}
@@ -202,9 +202,28 @@ public class DeterminantFinder {
 			System.out.println("Matrix isn't triangular");
 		}
 
-		// Loops through every element in the first row (for now)
-		for (int i = 0; i < 1; i++) {
-			for (int j = 0; j < sizeOfMatrix; j++) {
+		// Chooses which row or column to get the relevantElements from
+		ArrayList<Integer> iList = new ArrayList<Integer>();
+		ArrayList<Integer> jList = new ArrayList<Integer>();
+		if (rowOrColumnWithMax.equals("row")) {
+			iList.add(rowOrColumnNumber);
+			for (int k = 0; k < sizeOfMatrix; k++) {
+				jList.add(k);
+			}
+		} else if (rowOrColumnWithMax.equals("column")) {
+			for (int k = 0; k < sizeOfMatrix; k++) {
+				iList.add(k);
+			}
+			jList.add(rowOrColumnNumber);
+		}
+
+		System.out.println("");
+		System.out.println("iList: " + iList);
+		System.out.println("jList: " + jList);
+
+		// Loops through every element in the wanted rows or columns
+		for (int i : iList) {
+			for (int j : jList) {
 
 				int actualRowIndex = i + 1;
 				int actualColumnIndex = j + 1;
@@ -270,8 +289,8 @@ public class DeterminantFinder {
 				// multiplies it by the relevant element and the sign, and adds
 				// the product to the determinant
 				Double newMatrixDeterminant = getDeterminant(newMatrix);
-				
-				if (newMatrixDeterminant != 0.0){
+
+				if (newMatrixDeterminant != 0.0) {
 					Double actualNewMatrixDeterminant = sign * relevantElement * newMatrixDeterminant;
 
 					System.out.println("");
@@ -283,8 +302,8 @@ public class DeterminantFinder {
 					determinant = determinant + actualNewMatrixDeterminant;
 
 					System.out.println("new determinant is: " + determinant);
-				}				
-				
+				}
+
 			}
 		}
 
