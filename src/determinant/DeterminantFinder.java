@@ -190,9 +190,18 @@ public class DeterminantFinder {
 				// Work out the sign and find the relevant element in the row
 				int sign = (int) Math.pow(-1.0, actualRowIndex + actualColumnIndex);
 				Double relevantElement = matrix[i][j];
-
+				
 				System.out.println("");
 				System.out.println("#############################################");
+				System.out.println("sign is: " + sign);
+				System.out.println("relevantElement is: " + relevantElement);
+				
+				// If the relevant element is zero, the determinant of the resulting matrix will be zero, so this iteration can be skipped
+				if (relevantElement == 0.0){
+					System.out.println("relevantElement is zero, skipping this iteration");
+					System.out.println("");
+					continue;
+				}
 
 				// Create the new matrix to find the determinant of by removing
 				// the row and column the element is in
@@ -229,7 +238,7 @@ public class DeterminantFinder {
 					newMatrix[iterator] = row.toArray(new Double[row.size()]);
 				}
 
-				System.out.println("relevantElement is: " + relevantElement);
+				//System.out.println("relevantElement is: " + relevantElement);
 				System.out.println("newMatrix is: ");
 				for (Double[] row : newMatrix)
 					System.out.println(Arrays.toString(row));
@@ -242,9 +251,9 @@ public class DeterminantFinder {
 				Double newMatrixDeterminant = getDeterminant(newMatrix);
 				Double actualNewMatrixDeterminant = sign * relevantElement * newMatrixDeterminant;
 
-				System.out.println("");
-				System.out.println("sign is: " + sign);
-				System.out.println("relevantElement is: " + relevantElement);
+				//System.out.println("");
+				//System.out.println("sign is: " + sign);
+				//System.out.println("relevantElement is: " + relevantElement);
 				System.out.println("newMatrixDeterminant is: " + newMatrixDeterminant);
 				System.out.println("actualNewMatrixDeterminant is: " + actualNewMatrixDeterminant);
 				System.out.println("previousDeterminant is: " + determinant);
