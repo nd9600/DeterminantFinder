@@ -6,8 +6,8 @@ import java.util.Arrays;
 public class DeterminantFinder {
 
 	public static void main(String[] args) {
-		
-		Double[][] inputMatrix = { { 5.0, 1.0, 0.0, 1.0 }, { 0.0, 2.0, 3.0, 1.0 }, { 0.0, 0.0, 1.0, 4.0 }, { 0.0, 0.0, 0.0, 2.0 } };
+
+		Double[][] inputMatrix = { { 5.0, 1.0, 0.0, 1.0 }, { 7.0, 0.0, 3.0, 1.0 }, { 2.0, 0.0, 0.0, 0.0 }, { 1.0, 2.0,4.0, 9.0 } };
 
 		Double determinant = getDeterminant(inputMatrix);
 
@@ -27,39 +27,96 @@ public class DeterminantFinder {
 		}
 	}
 
-	private static Boolean checkIfTriangular(Double[][] matrix, int sizeOfMatrix) {
+	private static Object[] getRowOrColumnWithMostZeroes(Double[][] matrix, int sizeOfMatrix) {
+
+		Object[] rowOrColumnWithMostZeroes = {"row", 0};
+		int currentMaxNumberOfZeros = 0;
 		
-		//Initialises needed booleans
-		Boolean isLowerDiagonal = true;
-		Boolean isUpperDiagonal = true;
-		
-		//Loops through every element in the matrix, i is row position, j is column position less than i
-		for (int i = 1; i < sizeOfMatrix; i++) {
-			for (int j = 0; j < i; j++) {
-				
-				//lower element is a_i_j, upper element is a_j_i
-				Double relevantLowerElement = matrix[i][j];
-				Double relevantUpperElement = matrix[j][i];
-				
-				//If isLowerDiagonal isn't already false and the lower element isn't zero, set isLowerDiagonal to false
-				if (isLowerDiagonal && relevantLowerElement != 0){
-					isLowerDiagonal = false;
+		// Loops through every row and column in the matrix
+		for (int i = 0; i < sizeOfMatrix; i++) {
+			
+			// Initialises needed variables
+			int numberOfZerosInRow = 0;
+			int numberOfZerosInColumn = 0;
+			
+			// Gets the ith row
+			Double[] row = matrix[i];
+			
+			// Gets the ith column
+			Double[] column = new Double[sizeOfMatrix];
+			for (int j = 0; j < sizeOfMatrix; j++) {
+				column[j] = matrix[j][i];
+			}
+			
+			//Loops through every element in row, calculates the number of zeroes in the row
+			for (Double element : row){
+				if (element == 0.0){
+					numberOfZerosInRow = numberOfZerosInRow + 1;
 				}
-				
-				//If isUpperDiagonal isn't already false and the upper element isn't zero, set isUpperDiagonal to false
-				if (isUpperDiagonal && relevantUpperElement != 0){
-					isUpperDiagonal = false;
+			}
+			
+			//Loops through every element in column, calculates the number of zeroes in the column
+			for (Double element : column){
+				if (element == 0.0){
+					numberOfZerosInColumn = numberOfZerosInColumn + 1;
 				}
-				
-				//If isLowerDiagonal and isUpperDiagonal are both false, return false
-				if (! (isLowerDiagonal || isUpperDiagonal)){
-					return false;
-				}
-				
+			}
+			
+			//Sets the returned row or column with the most zeroes if this row currently has the most zeroes
+			if (numberOfZerosInRow > currentMaxNumberOfZeros){
+				rowOrColumnWithMostZeroes[0] = "row";
+				rowOrColumnWithMostZeroes[1] = i;
+				currentMaxNumberOfZeros = numberOfZerosInRow;
+			}
+			
+			//Sets the returned row or column with the most zeroes if this column currently has the most zeroes
+			if (numberOfZerosInColumn > currentMaxNumberOfZeros){
+				rowOrColumnWithMostZeroes[0] = "column";
+				rowOrColumnWithMostZeroes[1] = i;
+				currentMaxNumberOfZeros = numberOfZerosInColumn;
 			}
 		}
-		
-		//Return true if the matrix is a lower or upper triangular matrix
+
+		return rowOrColumnWithMostZeroes;
+	}
+
+	private static Boolean checkIfTriangular(Double[][] matrix, int sizeOfMatrix) {
+
+		// Initialises needed booleans
+		Boolean isLowerDiagonal = true;
+		Boolean isUpperDiagonal = true;
+
+		// Loops through every element in the matrix, i is row position, j is
+		// column position less than i
+		for (int i = 1; i < sizeOfMatrix; i++) {
+			for (int j = 0; j < i; j++) {
+
+				// lower element is a_i_j, upper element is a_j_i
+				Double relevantLowerElement = matrix[i][j];
+				Double relevantUpperElement = matrix[j][i];
+
+				// If isLowerDiagonal isn't already false and the lower element
+				// isn't zero, set isLowerDiagonal to false
+				if (isLowerDiagonal && relevantLowerElement != 0) {
+					isLowerDiagonal = false;
+				}
+
+				// If isUpperDiagonal isn't already false and the upper element
+				// isn't zero, set isUpperDiagonal to false
+				if (isUpperDiagonal && relevantUpperElement != 0) {
+					isUpperDiagonal = false;
+				}
+
+				// If isLowerDiagonal and isUpperDiagonal are both false, return
+				// false
+				if (!(isLowerDiagonal || isUpperDiagonal)) {
+					return false;
+				}
+
+			}
+		}
+
+		// Return true if the matrix is a lower or upper triangular matrix
 		return true;
 	}
 
@@ -81,7 +138,7 @@ public class DeterminantFinder {
 			System.out.println(e.getMessage());
 			return 0.0;
 		}
-		
+
 		System.out.println("");
 		System.out.println("sizeOfMatrix is: " + sizeOfMatrix);
 
@@ -101,10 +158,9 @@ public class DeterminantFinder {
 
 		// Else, if not 2x2
 
-		
 		// If the matrix is triangular, compute the determinant
 		Boolean matrixIsTriangular = checkIfTriangular(matrix, sizeOfMatrix);
-		
+
 		if (matrixIsTriangular) {
 			// Initialise determinant for multiplication
 			determinant = 1.0;
@@ -116,10 +172,13 @@ public class DeterminantFinder {
 				determinant = determinant * relevantElement;
 			}
 			return determinant;
-		}
-		else {
+		} else {
 			System.out.println("Matrix isn't triangular");
 		}
+
+		Object[] rowOrColumnWithMostZeroes = getRowOrColumnWithMostZeroes(matrix, sizeOfMatrix);
+
+		System.out.println("rowOrColumnWithMostZeroes: " + rowOrColumnWithMostZeroes[0] + ", " +  rowOrColumnWithMostZeroes[1]);
 
 		// Loops through every element in the first row (for now)
 		for (int i = 0; i < 1; i++) {
