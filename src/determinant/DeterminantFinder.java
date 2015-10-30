@@ -7,7 +7,8 @@ public class DeterminantFinder {
 
 	public static void main(String[] args) {
 
-		Double[][] inputMatrix = { { 5.0, 1.0, 0.0, 1.0 }, { 7.0, 0.0, 3.0, 1.0 }, { 2.0, 0.0, 0.0, 0.0 }, { 1.0, 2.0,4.0, 9.0 } };
+		Double[][] inputMatrix = { { 5.0, 1.0, 0.0, 1.0 }, { 7.0, 0.0, 3.0, 1.0 }, { 2.0, 0.0, 0.0, 0.0 },
+				{ 1.0, 2.0, 4.0, 9.0 } };
 
 		Double determinant = getDeterminant(inputMatrix);
 
@@ -29,52 +30,62 @@ public class DeterminantFinder {
 
 	private static Object[] getRowOrColumnWithMostZeroes(Double[][] matrix, int sizeOfMatrix) {
 
-		Object[] rowOrColumnWithMostZeroes = {"row", 0};
+		Object[] rowOrColumnWithMostZeroes = { "row", 0, false };
 		int currentMaxNumberOfZeros = 0;
-		
+
 		// Loops through every row and column in the matrix
 		for (int i = 0; i < sizeOfMatrix; i++) {
-			
+
 			// Initialises needed variables
 			int numberOfZerosInRow = 0;
 			int numberOfZerosInColumn = 0;
-			
+
 			// Gets the ith row
 			Double[] row = matrix[i];
-			
+
 			// Gets the ith column
 			Double[] column = new Double[sizeOfMatrix];
 			for (int j = 0; j < sizeOfMatrix; j++) {
 				column[j] = matrix[j][i];
 			}
-			
-			//Loops through every element in row, calculates the number of zeroes in the row
-			for (Double element : row){
-				if (element == 0.0){
+
+			// Loops through every element in row, calculates the number of
+			// zeroes in the row
+			for (Double element : row) {
+				if (element == 0.0) {
 					numberOfZerosInRow = numberOfZerosInRow + 1;
 				}
 			}
-			
-			//Loops through every element in column, calculates the number of zeroes in the column
-			for (Double element : column){
-				if (element == 0.0){
+
+			// Loops through every element in column, calculates the number of
+			// zeroes in the column
+			for (Double element : column) {
+				if (element == 0.0) {
 					numberOfZerosInColumn = numberOfZerosInColumn + 1;
 				}
 			}
-			
-			//Sets the returned row or column with the most zeroes if this row currently has the most zeroes
-			if (numberOfZerosInRow > currentMaxNumberOfZeros){
+
+			// Sets the returned row or column with the most zeroes if this row
+			// currently has the most zeroes
+			if (numberOfZerosInRow > currentMaxNumberOfZeros) {
 				rowOrColumnWithMostZeroes[0] = "row";
 				rowOrColumnWithMostZeroes[1] = i;
 				currentMaxNumberOfZeros = numberOfZerosInRow;
 			}
-			
-			//Sets the returned row or column with the most zeroes if this column currently has the most zeroes
-			if (numberOfZerosInColumn > currentMaxNumberOfZeros){
+
+			// Sets the returned row or column with the most zeroes if this
+			// column currently has the most zeroes
+			if (numberOfZerosInColumn > currentMaxNumberOfZeros) {
 				rowOrColumnWithMostZeroes[0] = "column";
 				rowOrColumnWithMostZeroes[1] = i;
 				currentMaxNumberOfZeros = numberOfZerosInColumn;
 			}
+
+			if (currentMaxNumberOfZeros == sizeOfMatrix) {
+				rowOrColumnWithMostZeroes[2] = true;
+				return rowOrColumnWithMostZeroes;
+			}
+
 		}
 
 		return rowOrColumnWithMostZeroes;
@@ -122,7 +133,6 @@ public class DeterminantFinder {
 
 	private static Double getDeterminant(Double[][] matrix) {
 
-		System.out.println("");
 		System.out.println("Input matrix is");
 		for (Double[] row : matrix)
 			System.out.println(Arrays.toString(row));
@@ -141,6 +151,22 @@ public class DeterminantFinder {
 
 		System.out.println("");
 		System.out.println("sizeOfMatrix is: " + sizeOfMatrix);
+
+		//Calculates the max number of zeros in any row or column 
+		Object[] rowOrColumnWithMostZeroes = getRowOrColumnWithMostZeroes(matrix, sizeOfMatrix);
+		String rowOrColumnWithMax = (String) rowOrColumnWithMostZeroes[0];
+		int maxNumberOfZeros = (int) rowOrColumnWithMostZeroes[1];
+		Boolean rowOrColumnAllZeros = (Boolean) rowOrColumnWithMostZeroes[2];
+
+		System.out.println("rowOrColumnWithMostZeroes: " + rowOrColumnWithMax + ", " + maxNumberOfZeros + ", "
+				+ rowOrColumnAllZeros);
+
+		// If a row or column has all elements equal to zero, the determinant is
+		// zero, so there is no point calculating it
+		if (rowOrColumnAllZeros) {
+			System.out.println("rowOrColumnAllZeros, returning zero");
+			return 0.0;
+		}
 
 		// Declare determinant
 		Double determinant = 0.0;
@@ -176,10 +202,6 @@ public class DeterminantFinder {
 			System.out.println("Matrix isn't triangular");
 		}
 
-		Object[] rowOrColumnWithMostZeroes = getRowOrColumnWithMostZeroes(matrix, sizeOfMatrix);
-
-		System.out.println("rowOrColumnWithMostZeroes: " + rowOrColumnWithMostZeroes[0] + ", " +  rowOrColumnWithMostZeroes[1]);
-
 		// Loops through every element in the first row (for now)
 		for (int i = 0; i < 1; i++) {
 			for (int j = 0; j < sizeOfMatrix; j++) {
@@ -190,14 +212,16 @@ public class DeterminantFinder {
 				// Work out the sign and find the relevant element in the row
 				int sign = (int) Math.pow(-1.0, actualRowIndex + actualColumnIndex);
 				Double relevantElement = matrix[i][j];
-				
+
 				System.out.println("");
 				System.out.println("#############################################");
 				System.out.println("sign is: " + sign);
 				System.out.println("relevantElement is: " + relevantElement);
-				
-				// If the relevant element is zero, the determinant of the resulting matrix will be zero, so this iteration can be skipped
-				if (relevantElement == 0.0){
+
+				// If the relevant element is zero, the determinant of the
+				// resulting matrix will be zero, so this iteration can be
+				// skipped
+				if (relevantElement == 0.0) {
 					System.out.println("relevantElement is zero, skipping this iteration");
 					System.out.println("");
 					continue;
@@ -238,29 +262,29 @@ public class DeterminantFinder {
 					newMatrix[iterator] = row.toArray(new Double[row.size()]);
 				}
 
-				//System.out.println("relevantElement is: " + relevantElement);
-				System.out.println("newMatrix is: ");
-				for (Double[] row : newMatrix)
-					System.out.println(Arrays.toString(row));
 				System.out.println("");
 				System.out.println("##");
+				System.out.println("");
 
 				// Calculate the determinant of the new smaller matrix,
 				// multiplies it by the relevant element and the sign, and adds
 				// the product to the determinant
 				Double newMatrixDeterminant = getDeterminant(newMatrix);
-				Double actualNewMatrixDeterminant = sign * relevantElement * newMatrixDeterminant;
+				
+				if (newMatrixDeterminant != 0.0){
+					Double actualNewMatrixDeterminant = sign * relevantElement * newMatrixDeterminant;
 
-				//System.out.println("");
-				//System.out.println("sign is: " + sign);
-				//System.out.println("relevantElement is: " + relevantElement);
-				System.out.println("newMatrixDeterminant is: " + newMatrixDeterminant);
-				System.out.println("actualNewMatrixDeterminant is: " + actualNewMatrixDeterminant);
-				System.out.println("previousDeterminant is: " + determinant);
+					System.out.println("");
+					System.out.println("#");
+					System.out.println("newMatrixDeterminant is: " + newMatrixDeterminant);
+					System.out.println("actualNewMatrixDeterminant is: " + actualNewMatrixDeterminant);
+					System.out.println("previousDeterminant is: " + determinant);
 
-				determinant = determinant + actualNewMatrixDeterminant;
+					determinant = determinant + actualNewMatrixDeterminant;
 
-				System.out.println("new determinant is: " + determinant);
+					System.out.println("new determinant is: " + determinant);
+				}				
+				
 			}
 		}
 
