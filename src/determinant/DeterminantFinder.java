@@ -18,6 +18,8 @@ public class DeterminantFinder {
 		if (determinant != 0.0) {
 			System.out.println("Determinant is: " + determinant);
 			System.out.println("Matrix is invertible");
+			System.out.println("Rows and columns are both linearly independent");
+			System.out.println("Nullspace = {0}");
 		} else {
 			if (determinant == 0.0) {
 				System.out.println("Determinant is 0.0");
@@ -25,6 +27,7 @@ public class DeterminantFinder {
 				System.out.println("Determinant does not exist");
 			}
 			System.out.println("Matrix is not invertible");
+			System.out.println("Columns are linearly dependent");
 		}
 	}
 
@@ -81,6 +84,7 @@ public class DeterminantFinder {
 				currentMaxNumberOfZeros = numberOfZerosInColumn;
 			}
 
+			// If the maximum number of zeros has been reached, return
 			if (currentMaxNumberOfZeros == sizeOfMatrix) {
 				rowOrColumnWithMostZeroes[2] = true;
 				return rowOrColumnWithMostZeroes;
@@ -158,7 +162,7 @@ public class DeterminantFinder {
 		int rowOrColumnNumber = (int) rowOrColumnWithMostZeroes[1];
 		Boolean rowOrColumnAllZeros = (Boolean) rowOrColumnWithMostZeroes[2];
 
-		System.out.println("Getting relevantElements from " + rowOrColumnWithMax + " " + (rowOrColumnNumber+1));
+		System.out.println("Getting relevantElements from " + rowOrColumnWithMax + " " + (rowOrColumnNumber + 1));
 		System.out.println("rowOrColumnAllZeros: " + rowOrColumnAllZeros);
 		// If a row or column has all elements equal to zero, the determinant is
 		// zero, so there is no point calculating it
@@ -205,15 +209,18 @@ public class DeterminantFinder {
 		// Chooses which row or column to get the relevantElements from
 		ArrayList<Integer> iList = new ArrayList<Integer>();
 		ArrayList<Integer> jList = new ArrayList<Integer>();
+
+		ArrayList<Integer> kList = new ArrayList<Integer>();
+		for (int k = 0; k < sizeOfMatrix; k++) {
+			kList.add(k);
+		}
+
+		//Calculate which rows to columns to loop through
 		if (rowOrColumnWithMax.equals("row")) {
 			iList.add(rowOrColumnNumber);
-			for (int k = 0; k < sizeOfMatrix; k++) {
-				jList.add(k);
-			}
+			jList.addAll(kList);
 		} else if (rowOrColumnWithMax.equals("column")) {
-			for (int k = 0; k < sizeOfMatrix; k++) {
-				iList.add(k);
-			}
+			iList.addAll(kList);
 			jList.add(rowOrColumnNumber);
 		}
 
@@ -234,6 +241,7 @@ public class DeterminantFinder {
 
 				System.out.println("");
 				System.out.println("#############################################");
+				System.out.println("i, j: " + i + ", " + j);
 				System.out.println("sign is: " + sign);
 				System.out.println("relevantElement is: " + relevantElement);
 
@@ -242,18 +250,17 @@ public class DeterminantFinder {
 				// skipped
 				if (relevantElement == 0.0) {
 					System.out.println("relevantElement is zero, skipping this iteration");
-					System.out.println("");
 					continue;
 				}
 
 				// Create the new matrix to find the determinant of by removing
 				// the row and column the element is in
-				ArrayList<ArrayList<Double>> newMatrixArrayList = new ArrayList<ArrayList<Double>>();
+				Double[][] newMatrix = new Double[sizeOfMatrix - 1][];
 
 				// Loops through every row
 				for (int k = 0; k < sizeOfMatrix; k++) {
 
-					ArrayList<Double> tempRowMatrixArrayList = new ArrayList<Double>();
+					Double[] tempRowMatrix = new Double[sizeOfMatrix - 1];
 					// Loops through every column
 					for (int l = 0; l < sizeOfMatrix; l++) {
 
@@ -262,23 +269,23 @@ public class DeterminantFinder {
 						if (!((k == i) || (l == j))) {
 							// Adds the new element to the temporary row if not
 							Double rowElement = matrix[k][l];
-							tempRowMatrixArrayList.add(rowElement);
+
+							//Adds the element in the lth position if the current column is left of the deleted column, (l-1)th position if to the right
+							if (l < j) {
+								tempRowMatrix[l] = rowElement;
+							} else if (l > j) {
+								tempRowMatrix[l - 1] = rowElement;
+							}
 						}
 					}
 
-					// Adds the temporary row to the new smaller matrix if it
-					// isn't empty
-					if (!tempRowMatrixArrayList.isEmpty()) {
-						newMatrixArrayList.add(tempRowMatrixArrayList);
+					// Adds the temporary row to the new smaller matrix in the kth position if the current row is above the deleted row, (k-1)th position if below
+					if (k < i) {
+						newMatrix[k] = tempRowMatrix;
+					} else if (k > i) {
+						newMatrix[(k - 1)] = tempRowMatrix;
 					}
 
-				}
-
-				// Converts the ArrayList to an array
-				Double[][] newMatrix = new Double[newMatrixArrayList.size()][];
-				for (int iterator = 0; iterator < newMatrixArrayList.size(); iterator++) {
-					ArrayList<Double> row = newMatrixArrayList.get(iterator);
-					newMatrix[iterator] = row.toArray(new Double[row.size()]);
 				}
 
 				System.out.println("");
