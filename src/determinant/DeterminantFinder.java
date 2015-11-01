@@ -1,6 +1,5 @@
 package determinant;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class DeterminantFinder {
@@ -135,6 +134,100 @@ public class DeterminantFinder {
 		return true;
 	}
 
+	private static Double actuallyGetDeterminant(Double[][] matrix, int sizeOfMatrix, int[] iList, int[] jList,
+			Double determinant) {
+		// Loops through every element in the wanted rows or columns
+		for (int i : iList) {
+			for (int j : jList) {
+
+				int actualRowIndex = i + 1;
+				int actualColumnIndex = j + 1;
+
+				// Work out the sign and find the relevant element in the row
+				int sign = (int) Math.pow(-1.0, actualRowIndex + actualColumnIndex);
+				Double relevantElement = matrix[i][j];
+
+				System.out.println("");
+				System.out.println("#############################################");
+				System.out.println("i, j: " + i + ", " + j);
+				System.out.println("sign is: " + sign);
+				System.out.println("relevantElement is: " + relevantElement);
+
+				// If the relevant element is zero, the determinant of the
+				// resulting matrix will be zero, so this iteration can be
+				// skipped
+				if (relevantElement == 0.0) {
+					System.out.println("relevantElement is zero, skipping this iteration");
+					continue;
+				}
+
+				// Create the new matrix to find the determinant of by removing
+				// the row and column the element is in
+				Double[][] newMatrix = new Double[sizeOfMatrix - 1][];
+
+				// Loops through every row
+				for (int k = 0; k < sizeOfMatrix; k++) {
+
+					Double[] tempRowMatrix = new Double[sizeOfMatrix - 1];
+					// Loops through every column
+					for (int l = 0; l < sizeOfMatrix; l++) {
+
+						// Checks if we aren't in the same row or column as the
+						// relevant element
+						if (!((k == i) || (l == j))) {
+							// Adds the new element to the temporary row if not
+							Double rowElement = matrix[k][l];
+
+							// Adds the element in the lth position if the
+							// current column is left of the deleted column,
+							// (l-1)th position if to the right
+							if (l < j) {
+								tempRowMatrix[l] = rowElement;
+							} else if (l > j) {
+								tempRowMatrix[l - 1] = rowElement;
+							}
+						}
+					}
+
+					// Adds the temporary row to the new smaller matrix in the
+					// kth position if the current row is above the deleted row,
+					// (k-1)th position if below
+					if (k < i) {
+						newMatrix[k] = tempRowMatrix;
+					} else if (k > i) {
+						newMatrix[(k - 1)] = tempRowMatrix;
+					}
+
+				}
+
+				System.out.println("");
+				System.out.println("##");
+				System.out.println("");
+
+				// Calculate the determinant of the new smaller matrix,
+				// multiplies it by the relevant element and the sign, and adds
+				// the product to the determinant
+				Double newMatrixDeterminant = getDeterminant(newMatrix);
+
+				if (newMatrixDeterminant != 0.0) {
+					Double actualNewMatrixDeterminant = sign * relevantElement * newMatrixDeterminant;
+
+					System.out.println("");
+					System.out.println("#");
+					System.out.println("newMatrixDeterminant is: " + newMatrixDeterminant);
+					System.out.println("actualNewMatrixDeterminant is: " + actualNewMatrixDeterminant);
+					System.out.println("previousDeterminant is: " + determinant);
+
+					determinant = determinant + actualNewMatrixDeterminant;
+
+					System.out.println("new determinant is: " + determinant);
+				}
+
+			}
+		}
+		return determinant;
+	}
+
 	private static Double getDeterminant(Double[][] matrix) {
 
 		System.out.println("Input matrix is");
@@ -206,112 +299,27 @@ public class DeterminantFinder {
 			System.out.println("Matrix isn't triangular");
 		}
 
-		// Chooses which row or column to get the relevantElements from
-		ArrayList<Integer> iList = new ArrayList<Integer>();
-		ArrayList<Integer> jList = new ArrayList<Integer>();
-
-		ArrayList<Integer> kList = new ArrayList<Integer>();
-		for (int k = 0; k < sizeOfMatrix; k++) {
-			kList.add(k);
-		}
-
-		//Calculate which rows to columns to loop through
+		// Chooses which row or column to get the relevantElements from and
+		// which rows to columns to loop through, and calculates the determinant
 		if (rowOrColumnWithMax.equals("row")) {
-			iList.add(rowOrColumnNumber);
-			jList.addAll(kList);
-		} else if (rowOrColumnWithMax.equals("column")) {
-			iList.addAll(kList);
-			jList.add(rowOrColumnNumber);
-		}
+			int[] iList = new int[1];
+			int[] jList = new int[sizeOfMatrix];
 
-		System.out.println("");
-		System.out.println("iList: " + iList);
-		System.out.println("jList: " + jList);
-
-		// Loops through every element in the wanted rows or columns
-		for (int i : iList) {
-			for (int j : jList) {
-
-				int actualRowIndex = i + 1;
-				int actualColumnIndex = j + 1;
-
-				// Work out the sign and find the relevant element in the row
-				int sign = (int) Math.pow(-1.0, actualRowIndex + actualColumnIndex);
-				Double relevantElement = matrix[i][j];
-
-				System.out.println("");
-				System.out.println("#############################################");
-				System.out.println("i, j: " + i + ", " + j);
-				System.out.println("sign is: " + sign);
-				System.out.println("relevantElement is: " + relevantElement);
-
-				// If the relevant element is zero, the determinant of the
-				// resulting matrix will be zero, so this iteration can be
-				// skipped
-				if (relevantElement == 0.0) {
-					System.out.println("relevantElement is zero, skipping this iteration");
-					continue;
-				}
-
-				// Create the new matrix to find the determinant of by removing
-				// the row and column the element is in
-				Double[][] newMatrix = new Double[sizeOfMatrix - 1][];
-
-				// Loops through every row
-				for (int k = 0; k < sizeOfMatrix; k++) {
-
-					Double[] tempRowMatrix = new Double[sizeOfMatrix - 1];
-					// Loops through every column
-					for (int l = 0; l < sizeOfMatrix; l++) {
-
-						// Checks if we aren't in the same row or column as the
-						// relevant element
-						if (!((k == i) || (l == j))) {
-							// Adds the new element to the temporary row if not
-							Double rowElement = matrix[k][l];
-
-							//Adds the element in the lth position if the current column is left of the deleted column, (l-1)th position if to the right
-							if (l < j) {
-								tempRowMatrix[l] = rowElement;
-							} else if (l > j) {
-								tempRowMatrix[l - 1] = rowElement;
-							}
-						}
-					}
-
-					// Adds the temporary row to the new smaller matrix in the kth position if the current row is above the deleted row, (k-1)th position if below
-					if (k < i) {
-						newMatrix[k] = tempRowMatrix;
-					} else if (k > i) {
-						newMatrix[(k - 1)] = tempRowMatrix;
-					}
-
-				}
-
-				System.out.println("");
-				System.out.println("##");
-				System.out.println("");
-
-				// Calculate the determinant of the new smaller matrix,
-				// multiplies it by the relevant element and the sign, and adds
-				// the product to the determinant
-				Double newMatrixDeterminant = getDeterminant(newMatrix);
-
-				if (newMatrixDeterminant != 0.0) {
-					Double actualNewMatrixDeterminant = sign * relevantElement * newMatrixDeterminant;
-
-					System.out.println("");
-					System.out.println("#");
-					System.out.println("newMatrixDeterminant is: " + newMatrixDeterminant);
-					System.out.println("actualNewMatrixDeterminant is: " + actualNewMatrixDeterminant);
-					System.out.println("previousDeterminant is: " + determinant);
-
-					determinant = determinant + actualNewMatrixDeterminant;
-
-					System.out.println("new determinant is: " + determinant);
-				}
-
+			iList[0] = rowOrColumnNumber;
+			for (int k = 0; k < sizeOfMatrix; k++) {
+				jList[k] = k;
 			}
+			determinant = actuallyGetDeterminant(matrix, sizeOfMatrix, iList, jList, determinant);
+
+		} else if (rowOrColumnWithMax.equals("column")) {
+			int[] iList = new int[sizeOfMatrix];
+			int[] jList = new int[1];
+
+			for (int k = 0; k < sizeOfMatrix; k++) {
+				iList[k] = k;
+			}
+			jList[0] = rowOrColumnNumber;
+			determinant = actuallyGetDeterminant(matrix, sizeOfMatrix, iList, jList, determinant);
 		}
 
 		return determinant;
